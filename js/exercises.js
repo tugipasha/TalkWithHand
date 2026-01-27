@@ -177,6 +177,24 @@ class LessonManager {
                         }, 2000);
                     } else {
                         feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
+                        if (window.TWH_API_URL && window.AIService) {
+                            const landmarksArr = CameraService.latestResults?.multiHandLandmarks || [];
+                            window.AIService.remoteClassify({
+                                landmarks: landmarksArr,
+                                target: this.currentLesson.items[this.currentItemIndex].id
+                            }).then(remote => {
+                                if (remote && remote.isCorrect) {
+                                    feedback.textContent = (remote.message || 'Doğru') + ' ✨';
+                                    document.getElementById('feedback-box').classList.add('success');
+                                    setTimeout(() => {
+                                        document.getElementById('feedback-box').classList.remove('success');
+                                        this.nextItem();
+                                    }, 2000);
+                                } else if (remote && remote.message) {
+                                    feedback.textContent = remote.message;
+                                }
+                            }).catch(() => {});
+                        }
                     }
                 };
 

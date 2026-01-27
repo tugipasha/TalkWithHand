@@ -14,6 +14,18 @@ const AIService = {
         if (t === 'a') return this.verifyA(primary);
         return { isCorrect: true, accuracy: 80, message: 'İşaret algılandı.' };
     },
+    async remoteClassify(payload) {
+        const url = window.TWH_API_URL;
+        if (!url) return null;
+        const res = await fetch(`${url}/classify-sign`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data;
+    },
     verifyA(landmarks) {
         const tips = [8, 12, 16, 20];
         const pips = [6, 10, 14, 18];
