@@ -16,19 +16,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // UI Güncelleme
     const nameEl = document.getElementById('profile-name');
-    const levelEl = document.getElementById('profile-level');
+    const levelBadgeEl = document.getElementById('profile-level-badge');
+    const levelTextEl = document.getElementById('profile-level-text');
     const avatarEl = document.getElementById('profile-avatar');
-    const streakEl = document.getElementById('profile-streak');
+    const streakNumEl = document.getElementById('profile-streak-num');
     const lessonsCountEl = document.getElementById('completed-lessons-count');
     const pointsEl = document.getElementById('total-points');
+    const progressFillEl = document.getElementById('level-progress-fill');
+    const progressPercentEl = document.getElementById('next-level-percent');
     const logoutBtn = document.getElementById('logout-btn');
 
     if (nameEl) nameEl.textContent = user.name;
-    if (levelEl) levelEl.textContent = `Seviye ${user.progress.level}`;
+    if (levelBadgeEl) levelBadgeEl.textContent = user.progress.level;
+    if (levelTextEl) levelTextEl.textContent = `Seviye ${user.progress.level}`;
     if (avatarEl) avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2563eb&color=fff&size=128`;
-    if (streakEl) streakEl.innerHTML = `<i class="fas fa-fire"></i> ${user.progress.stats.streak} Günlük Seri`;
+    if (streakNumEl) streakNumEl.textContent = user.progress.stats.streak;
     if (lessonsCountEl) lessonsCountEl.textContent = user.progress.completedLessons.length;
     if (pointsEl) pointsEl.textContent = user.progress.points;
+
+    // Seviye ilerlemesini hesapla (Basit bir mantık: her seviye 1000 puan)
+    const currentPoints = user.progress.points;
+    const levelPoints = 1000;
+    const nextLevelXP = levelPoints - (currentPoints % levelPoints);
+    const progressPercent = Math.min(((currentPoints % levelPoints) / levelPoints) * 100, 100);
+    
+    if (progressFillEl) progressFillEl.style.width = `${progressPercent}%`;
+    if (progressPercentEl) progressPercentEl.textContent = `${Math.round(progressPercent)}%`;
+    
+    const hintEl = document.querySelector('.next-level-hint');
+    if (hintEl) hintEl.textContent = `Sonraki seviyeye ${nextLevelXP} XP kaldı`;
+
+    // Unvan güncelleme
+    const titleEl = document.getElementById('profile-title');
+    if (titleEl) {
+        if (user.progress.level >= 10) titleEl.textContent = 'İşaret Dili Ustası';
+        else if (user.progress.level >= 5) titleEl.textContent = 'Deneyimli Öğrenci';
+        else titleEl.textContent = 'İşaret Dili Öğrencisi';
+    }
 
     // Başarımları Yükle
     loadAchievements(user);
@@ -75,7 +99,7 @@ function loadAchievements(user) {
 }
 
 function updateTopBadges(user) {
-    const badgesDiv = document.querySelector('.badges');
+    const badgesDiv = document.getElementById('profile-badges-container');
     if (!badgesDiv) return;
 
     const userAchievements = AchievementService.getUserAchievements();
@@ -91,6 +115,6 @@ function updateTopBadges(user) {
             <span class="badge" title="${a.description}">
                 <i class="fas ${a.icon}"></i> ${a.title}
             </span>
-        `).join('') + `<span id="profile-streak" class="badge"><i class="fas fa-fire"></i> ${user.progress.stats.streak} Günlük Seri</span>`;
+        `).join('');
     }
 }

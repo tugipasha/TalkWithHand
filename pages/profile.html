@@ -55,24 +55,55 @@
 
             <div class="profile-grid">
                 <!-- User Profile Card -->
-                <div class="profile-card card">
-                    <div class="profile-header">
-                        <img id="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&size=128" alt="User" class="large-avatar">
-                        <h2 id="profile-name">Kullanıcı</h2>
-                        <p id="profile-level">Başlangıç Seviyesi</p>
-                        <div class="badges">
-                            <span class="badge"><i class="fas fa-award"></i> Hızlı Öğrenen</span>
-                            <span id="profile-streak" class="badge"><i class="fas fa-fire"></i> 0 Günlük Seri</span>
+                <div class="profile-card-container">
+                    <div class="profile-card card">
+                        <div class="profile-cover"></div>
+                        <div class="profile-header">
+                            <div class="avatar-container">
+                                <img id="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&size=128" alt="User" class="large-avatar">
+                                <span class="level-badge" id="profile-level-badge">1</span>
+                            </div>
+                            <h2 id="profile-name">Kullanıcı</h2>
+                            <p id="profile-title">İşaret Dili Öğrencisi</p>
+                            
+                            <div class="level-progress-container">
+                                <div class="level-info">
+                                    <span id="profile-level-text">Seviye 1</span>
+                                    <span id="next-level-percent">45%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="level-progress-fill" style="width: 45%;"></div>
+                                </div>
+                                <p class="next-level-hint">Sonraki seviyeye 250 XP kaldı</p>
+                            </div>
+
+                            <div class="badges" id="profile-badges-container">
+                                <!-- Badges will be loaded here -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="profile-stats">
-                        <div class="p-stat">
-                            <span id="completed-lessons-count" class="num">0</span>
-                            <span class="lab">Tamamlanan Ders</span>
-                        </div>
-                        <div class="p-stat">
-                            <span id="total-points" class="num">0</span>
-                            <span class="lab">Toplam Puan</span>
+
+                        <div class="profile-stats-grid">
+                            <div class="stat-box">
+                                <i class="fas fa-graduation-cap"></i>
+                                <div class="stat-info">
+                                    <span id="completed-lessons-count" class="stat-num">0</span>
+                                    <span class="stat-lab">Ders</span>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-star"></i>
+                                <div class="stat-info">
+                                    <span id="total-points" class="stat-num">0</span>
+                                    <span class="stat-lab">Puan</span>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-fire"></i>
+                                <div class="stat-info">
+                                    <span id="profile-streak-num" class="stat-num">0</span>
+                                    <span class="stat-lab">Seri</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
