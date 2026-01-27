@@ -1,5 +1,6 @@
 import StorageService from './storage.js';
 import AuthService from './auth.js';
+import AchievementService from './achievements.js';
 
 /**
  * TalkWithHand - Kullanıcı Veri ve İlerleme Servisi
@@ -22,6 +23,9 @@ const UserService = {
             
             StorageService.save('users', users);
             AuthService.setCurrentUser(users[userIndex]); // Session güncelle
+
+            // Başarımları kontrol et
+            AchievementService.checkAchievements();
         }
     },
 

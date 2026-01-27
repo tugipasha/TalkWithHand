@@ -1,5 +1,6 @@
 import AuthService from './services/auth.js';
 import LessonService from './services/lessonService.js';
+import UserService from './services/user.js';
 
 /**
  * TalkWithHand - Eğitim & Ders Yönetimi
@@ -110,6 +111,9 @@ class LessonManager {
             this.updateUI();
             this.renderCurriculum();
         } else {
+            // Dersi tamamla
+            UserService.completeLesson(this.currentLesson.id);
+
             const nextLesson = LessonService.getNextLesson(this.currentLesson.id);
             if (nextLesson) {
                 if (confirm('Tebrikler! Bu dersi tamamladınız. Bir sonraki derse geçmek ister misiniz?')) {
