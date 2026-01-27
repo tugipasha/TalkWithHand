@@ -135,32 +135,52 @@ class LessonManager {
 
     async toggleCamera() {
         const video = document.getElementById('webcam');
+        const canvas = document.getElementById('overlay');
         const btn = document.getElementById('start-camera');
         const feedback = document.getElementById('feedback-text');
+        const verifyBtn = document.getElementById('verify-action');
 
-        if (this.stream) {
-            this.stream.getTracks().forEach(track => track.stop());
-            this.stream = null;
-            video.srcObject = null;
+        if (CameraService.isStarted) {
+            await CameraService.stop();
             btn.innerHTML = '<i class="fas fa-camera"></i> Kamerayı Başlat';
             feedback.textContent = 'Kamera Bekleniyor...';
+            verifyBtn.classList.add('hidden');
         } else {
             try {
-                this.stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = this.stream;
-                btn.innerHTML = '<i class="fas fa-stop"></i> Kamerayı Durdur';
-                feedback.textContent = 'Yapay Zeka Hazırlanıyor...';
+                feedback.textContent = 'Yapay Zeka Yükleniyor...';
                 
-                // Simulate AI recognition after 2 seconds
-                setTimeout(() => {
-                    if (this.stream) {
-                        feedback.textContent = 'Doğru Hareket! Harikasın ✨';
+                if (!CameraService.hands) {
+                    await CameraService.init(video, canvas);
+                    
+                    CameraService.addResultCallback((results) => {
+                        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                            feedback.textContent = 'El Algılandı! İşareti Yapın...';
+                            verifyBtn.classList.remove('hidden');
+                        } else {
+                            feedback.textContent = 'El Bekleniyor...';
+                            verifyBtn.classList.add('hidden');
+                        }
+                    });
+                }
+
+                await CameraService.start();
+                btn.innerHTML = '<i class="fas fa-stop"></i> Kamerayı Durdur';
+                
+                verifyBtn.onclick = () => {
+                    const result = CameraService.verifySign(null, this.currentLesson.items[this.currentItemIndex].id);
+                    if (result.success) {
+                        feedback.textContent = result.message + ' ✨';
                         document.getElementById('feedback-box').classList.add('success');
-                        document.getElementById('verify-action').classList.remove('hidden');
+                        setTimeout(() => {
+                            document.getElementById('feedback-box').classList.remove('success');
+                            this.nextItem();
+                        }, 2000);
                     }
-                }, 2000);
+                };
+
             } catch (err) {
                 console.error("Kamera hatası:", err);
+                feedback.textContent = 'Hata: Kameraya erişilemedi.';
                 alert("Kameraya erişilemedi. Lütfen izin verdiğinizden emin olun.");
             }
         }

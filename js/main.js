@@ -31,6 +31,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Sidebar Toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const appLayout = document.querySelector('.app-layout');
+    
+    if (sidebarToggle && appLayout) {
+        // Load saved state
+        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+        if (isCollapsed) {
+            appLayout.classList.add('sidebar-collapsed');
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            appLayout.classList.toggle('sidebar-collapsed');
+            const nowCollapsed = appLayout.classList.contains('sidebar-collapsed');
+            localStorage.setItem('sidebar-collapsed', nowCollapsed);
+            
+            // Trigger window resize for charts to redraw
+            window.dispatchEvent(new Event('resize'));
+        });
+    }
+
     // Mobile Menu Toggle for Landing Page
     const menuToggle = document.querySelector('.mobile-menu-toggle');
     const landingNavLinks = document.querySelector('.nav-links');
