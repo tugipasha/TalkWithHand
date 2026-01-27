@@ -24,7 +24,7 @@ const CameraService = {
         });
 
         this.hands.setOptions({
-            maxNumHands: 1,
+            maxNumHands: 2,
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
@@ -94,11 +94,10 @@ const CameraService = {
             return { success: false, message: 'El algılanamadı. Lütfen elinizi kameraya gösterin.' };
         }
 
-        const landmarks = results.multiHandLandmarks[0];
+        const landmarksArr = results.multiHandLandmarks;
         
-        // AIService üzerinden analizi yap
         if (window.AIService) {
-            const analysis = window.AIService.analyzeLandmarks(landmarks, targetSignId);
+            const analysis = window.AIService.analyzeLandmarks(landmarksArr, targetSignId);
             return {
                 success: analysis.isCorrect,
                 message: analysis.message,

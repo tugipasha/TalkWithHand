@@ -4,61 +4,37 @@
  */
 
 const AIService = {
-    /**
-     * Landmark verilerini kullanarak işareti analiz et
-     */
-    analyzeLandmarks(landmarks, targetSignId) {
-        if (!landmarks) return { isCorrect: false, accuracy: 0, message: 'El algılanamadı' };
-
-        switch (targetSignId.toLowerCase()) {
-            case 'a':
-                return this.verifyA(landmarks);
-            default:
-                // Tanımlanmamış işaretler için temel el algılama simülasyonu
-                return { isCorrect: true, accuracy: 100, message: 'İşaret algılandı.' };
+    analyzeLandmarks(handLandmarksArr, targetSignId) {
+        if (!handLandmarksArr || handLandmarksArr.length === 0) {
+            return { isCorrect: false, accuracy: 0, message: 'El algılanamadı' };
         }
+        const primary = handLandmarksArr[0];
+        const secondary = handLandmarksArr[1] || null;
+        const t = (targetSignId || '').toLowerCase();
+        if (t === 'a') return this.verifyA(primary);
+        return { isCorrect: true, accuracy: 80, message: 'İşaret algılandı.' };
     },
-
-    /**
-     * TİD 'A' Harfi Doğrulama
-     * Mantık: Yumruk kapalı, baş parmak yanda.
-     */
     verifyA(landmarks) {
-        // Parmak uçları (Tips) ve eklemler (PIP)
-        const tips = [8, 12, 16, 20]; // İşaret, Orta, Yüzük, Serçe
+        const tips = [8, 12, 16, 20];
         const pips = [6, 10, 14, 18];
-
-        // 1. Tüm ana parmakların kapalı olduğunu kontrol et
-        // (Uç noktası, eklem noktasından daha aşağıda olmalı - Y ekseni)
         let fingersClosed = true;
         tips.forEach((tipIndex, i) => {
             if (landmarks[tipIndex].y < landmarks[pips[i]].y) {
                 fingersClosed = false;
             }
         });
-
-        // 2. Baş parmak konumu (Yanda olmalı)
-        // Baş parmak ucu (4), işaret parmağı köküne (5) yakın olmalı
         const thumbTip = landmarks[4];
         const indexRoot = landmarks[5];
         const dist = Math.sqrt(Math.pow(thumbTip.x - indexRoot.x, 2) + Math.pow(thumbTip.y - indexRoot.y, 2));
-        
-        const isThumbCorrect = dist < 0.1; // Eşik değer
-
-        const isCorrect = fingersClosed && isThumbCorrect;
-
+        const isThumbCorrect = dist < 0.1;
+        const ok = fingersClosed && isThumbCorrect;
         return {
-            isCorrect: isCorrect,
-            accuracy: isCorrect ? 95 : 20,
-            message: isCorrect ? 
-                'Harika! TİD "A" harfini doğru yaptın. ✨' : 
-                'Parmaklarını yumruk yap ve baş parmağını yanda tut.'
+            isCorrect: ok,
+            accuracy: ok ? 95 : 20,
+            message: ok ? 'Harika! TİD "A" harfini doğru yaptın. ✨' : 'Parmaklarını yumruk yap ve baş parmağını yanda tut.'
         };
     },
-
-    // Model yükleme simülasyonu (MediaPipe zaten yüklü olduğu için sembolik)
     async loadModel() {
-        console.log('TİD AI Mantığı hazır.');
         return true;
     }
 };

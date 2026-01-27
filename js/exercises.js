@@ -175,6 +175,8 @@ class LessonManager {
                             document.getElementById('feedback-box').classList.remove('success');
                             this.nextItem();
                         }, 2000);
+                    } else {
+                        feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
                     }
                 };
 
