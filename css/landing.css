@@ -251,20 +251,34 @@
     font-weight: 700;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .hero-content {
         grid-template-columns: 1fr;
         text-align: center;
     }
+
+    .hero-text h1 {
+        font-size: 2.5rem;
+    }
+
     .hero-text p {
         margin: 0 auto 30px;
     }
+
     .hero-btns {
         justify-content: center;
     }
+
+    .hero-icon-container {
+        height: 300px;
+    }
+
     .features-grid, .steps {
         grid-template-columns: 1fr;
     }
+}
+
+@media (max-width: 768px) {
     .nav-links {
         display: none;
     }
