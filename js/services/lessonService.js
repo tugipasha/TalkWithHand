@@ -14,14 +14,14 @@ const LessonService = {
                 type: 'alphabet',
                 items: [
                     {
-                        id: 'char-a',
+                        id: 'a',
                         label: 'A Harfi',
-                        content: 'İşaret dilinde "A" harfi, elin yumruk yapılıp baş parmağın diğer parmakların yanına yaslanmasıyla oluşur.',
-                        tips: ['Yumruğunuzu çok sıkmayın.', 'Baş parmağınızın dik durduğundan emin olun.'],
+                        content: 'Türk İşaret Dili\'nde (TİD) "A" harfi, elin yumruk yapılıp baş parmağın işaret parmağının yanına yaslanmasıyla oluşur.',
+                        tips: ['Elinizi yumruk yapın.', 'Baş parmağınızın işaret parmağınıza bitişik durduğundan emin olun.'],
                         imageUrl: 'https://images.unsplash.com/photo-1534114775010-0648f3281987?auto=format&fit=crop&q=80&w=400'
                     },
                     {
-                        id: 'char-b',
+                        id: 'b',
                         label: 'B Harfi',
                         content: 'Dört parmağınızın bitişik ve dik, baş parmağınızın avuç içine doğru kıvrık olduğu işarettir.',
                         tips: ['Parmaklarınızın birbirine değdiğinden emin olun.', 'Eliniz karşıya baksın.'],

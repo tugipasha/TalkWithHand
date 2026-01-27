@@ -167,7 +167,7 @@ class LessonManager {
                 btn.innerHTML = '<i class="fas fa-stop"></i> Kamerayı Durdur';
                 
                 verifyBtn.onclick = () => {
-                    const result = CameraService.verifySign(null, this.currentLesson.items[this.currentItemIndex].id);
+                    const result = CameraService.verifySign(CameraService.latestResults, this.currentLesson.items[this.currentItemIndex].id);
                     if (result.success) {
                         feedback.textContent = result.message + ' ✨';
                         document.getElementById('feedback-box').classList.add('success');

@@ -9,6 +9,7 @@ const CameraService = {
     canvasCtx: null,
     isStarted: false,
     onResultCallbacks: [],
+    latestResults: null,
 
     async init(videoElement, canvasElement) {
         this.videoElement = videoElement;
@@ -61,6 +62,7 @@ const CameraService = {
     },
 
     onResults(results) {
+        this.latestResults = results;
         // Canvas'ı temizle
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
@@ -84,20 +86,27 @@ const CameraService = {
     },
 
     /**
-     * İşaret Doğrulama Mantığı (Basitleştirilmiş)
-     * Gerçek bir projede burada landmark koordinatları karşılaştırılır veya bir model çağrılır.
+     * İşaret Doğrulama Mantığı
+     * AIService kullanarak el hareketini analiz eder.
      */
     verifySign(results, targetSignId) {
-        if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-            return { success: false, message: 'El algılanamadı' };
+        if (!results || !results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+            return { success: false, message: 'El algılanamadı. Lütfen elinizi kameraya gösterin.' };
         }
 
-        // Şimdilik simülasyon: El algılandıysa ve "Doğrula"ya basıldıysa başarılı say
-        // Gerçek TİD algılama için landmark analizi gerekir.
         const landmarks = results.multiHandLandmarks[0];
         
-        // Örnek: Baş parmak ucu (4) ve İşaret parmağı ucu (8) arasındaki mesafe kontrolü vb.
-        return { success: true, message: 'Harika! İşaret doğru görünüyor.' };
+        // AIService üzerinden analizi yap
+        if (window.AIService) {
+            const analysis = window.AIService.analyzeLandmarks(landmarks, targetSignId);
+            return {
+                success: analysis.isCorrect,
+                message: analysis.message,
+                accuracy: analysis.accuracy
+            };
+        }
+
+        return { success: false, message: 'Yapay zeka servisi hazır değil.' };
     }
 };
 
