@@ -61,63 +61,91 @@
             <section class="dashboard-grid">
                 <!-- Learning Path -->
                 <div class="learning-path card">
-                    <h3>Öğrenme Yolun</h3>
+                    <h3><i class="fas fa-route" style="color: var(--primary-blue);"></i> Öğrenme Yolun</h3>
                     <div class="path-steps">
                         <div class="path-step completed">
                             <div class="step-icon"><i class="fas fa-check"></i></div>
                             <div class="step-info">
                                 <h4>Harfler - Bölüm 1</h4>
-                                <p>A, B, C, D</p>
+                                <p>A, B, C, D harflerini tamamladın.</p>
                             </div>
                         </div>
                         <div class="path-step active">
                             <div class="step-icon">2</div>
                             <div class="step-info">
                                 <h4>Harfler - Bölüm 2</h4>
-                                <p>E, F, G, H</p>
+                                <p>E, F, G, H harfleriyle devam et.</p>
                             </div>
-                            <a href="exercises.html" class="btn btn-primary btn-sm">Başla</a>
+                            <a href="exercises.html" class="btn btn-primary btn-sm">Devam Et</a>
                         </div>
                         <div class="path-step locked">
                             <div class="step-icon"><i class="fas fa-lock"></i></div>
                             <div class="step-info">
                                 <h4>Temel Selamlaşma</h4>
-                                <p>Merhaba, Nasılsın?</p>
+                                <p>Henüz erişilemez.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Daily Progress -->
-                <div class="daily-progress card">
-                    <h3>Günlük Hedef</h3>
+                <!-- Overall Progress -->
+                <div class="overall-progress card">
+                    <h3><i class="fas fa-chart-pie" style="color: #8b5cf6;"></i> Genel İlerleme</h3>
                     <div class="progress-circle">
                         <svg viewBox="0 0 36 36" class="circular-chart">
                             <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="circle" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <text x="18" y="20.35" class="percentage">75%</text>
+                            <path class="circle" id="dashboard-progress-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="dashboard-progress-text">0%</text>
                         </svg>
                     </div>
-                    <p class="text-center">Bugünkü hedefine çok az kaldı!</p>
+                    <div class="progress-info-text">
+                        <h4>Harika Gidiyorsun!</h4>
+                        <p>Hedefine ulaşmak için 5 ders daha tamamlamalısın.</p>
+                    </div>
                 </div>
 
-                <!-- Quick Stats -->
-                <div class="quick-stats card">
-                    <h3>İstatistiklerin</h3>
+                <!-- User Stats -->
+                <div class="user-stats card">
+                    <h3><i class="fas fa-bolt" style="color: #f59e0b;"></i> İstatistiklerin</h3>
                     <div class="stats-list">
                         <div class="stat-item">
-                            <span class="stat-label">Öğrenilen Kelime</span>
-                            <span class="stat-value">42</span>
+                            <i class="fas fa-book-open"></i>
+                            <div class="stat-details">
+                                <span class="stat-label">Öğrenilen</span>
+                                <span class="stat-value" id="stats-learned">24 Kelime</span>
+                            </div>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Toplam Pratik</span>
-                            <span class="stat-value">12.5 Sa</span>
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-details">
+                                <span class="stat-label">Çalışma Süresi</span>
+                                <span class="stat-value" id="stats-time">8.4 Saat</span>
+                            </div>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Doğruluk Oranı</span>
-                            <span class="stat-value">%88</span>
+                            <i class="fas fa-bullseye"></i>
+                            <div class="stat-details">
+                                <span class="stat-label">Doğruluk</span>
+                                <span class="stat-value" id="stats-accuracy">%92</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="exercises.html" class="action-card">
+                        <i class="fas fa-play"></i>
+                        <span>Derse Başla</span>
+                    </a>
+                    <a href="profile.html" class="action-card">
+                        <i class="fas fa-trophy"></i>
+                        <span>Başarımlar</span>
+                    </a>
+                    <a href="settings.html" class="action-card">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Profili Düzenle</span>
+                    </a>
                 </div>
             </section>
         </main>

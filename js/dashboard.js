@@ -32,11 +32,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // İstatistikleri Yükle (Örnek)
+    // İstatistikleri Yükle
     loadUserStats(user);
 });
 
 function loadUserStats(user) {
-    // Burada ileride progress bar ve diğer dinamik alanlar güncellenecek
-    console.log('Kullanıcı verileri yüklendi:', user);
+    const stats = user.progress.stats;
+    const progressPercent = user.progress.overall;
+
+    // Elementleri bul
+    const progressCircle = document.getElementById('dashboard-progress-circle');
+    const progressText = document.getElementById('dashboard-progress-text');
+    const learnedText = document.getElementById('stats-learned');
+    const timeText = document.getElementById('stats-time');
+    const accuracyText = document.getElementById('stats-accuracy');
+
+    // Progress circle güncelle (stroke-dasharray="75, 100")
+    if (progressCircle) {
+        progressCircle.setAttribute('stroke-dasharray', `${progressPercent}, 100`);
+    }
+    if (progressText) {
+        progressText.textContent = `${progressPercent}%`;
+    }
+
+    // Alt istatistikleri güncelle
+    if (learnedText) learnedText.textContent = `${stats.learnedWords} Kelime`;
+    if (timeText) timeText.textContent = `${stats.practiceHours} Saat`;
+    if (accuracyText) accuracyText.textContent = `%${stats.accuracy}`;
 }
