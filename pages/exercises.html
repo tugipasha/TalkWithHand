@@ -46,50 +46,100 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <div class="exercise-info">
-                    <h1>Harfler - Bölüm 2</h1>
-                    <p>Hedef: <span class="target-letter">"E"</span> Harfini Yapın</p>
+                <div class="lesson-header-info">
+                    <div class="breadcrumb">
+                        <a href="dashboard.html">Dashboard</a> / <span id="current-course-title">Temel İşaret Dili</span>
+                    </div>
+                    <h1 id="lesson-title">Ders Yükleniyor...</h1>
                 </div>
-                <div class="exercise-timer">
-                    <i class="fas fa-clock"></i>
-                    <span id="timer">00:45</span>
+                <div class="lesson-navigation">
+                    <button id="prev-lesson" class="btn-icon" title="Önceki Ders"><i class="fas fa-chevron-left"></i></button>
+                    <div class="lesson-progress-wrapper">
+                        <span id="lesson-progress-text">0/0</span>
+                        <div class="progress-bar-sm">
+                            <div id="lesson-progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button id="next-lesson" class="btn-icon" title="Sonraki Ders"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </header>
 
-            <div class="exercise-container">
-                <!-- Camera Feed Section -->
-                <div class="camera-section card">
-                    <div class="video-wrapper">
-                        <video id="webcam" autoplay playsinline></video>
-                        <canvas id="overlay"></canvas>
-                        <div class="ai-feedback" id="feedback-box">
-                            <span id="feedback-text">Hazırlanıyor...</span>
+            <div class="lesson-grid">
+                <!-- Left: Lesson Content & Documentation -->
+                <div class="lesson-content-area">
+                    <div class="card lesson-doc">
+                        <div class="doc-header">
+                            <span class="badge" id="lesson-type-badge">Harf</span>
+                            <h2 id="item-label">Yükleniyor...</h2>
+                        </div>
+                        
+                        <div class="doc-body">
+                            <div class="doc-text">
+                                <h3>Hakkında</h3>
+                                <p id="item-content">İçerik hazırlanıyor...</p>
+                                
+                                <div class="tips-box">
+                                    <h4><i class="fas fa-lightbulb"></i> İpucu & Püf Noktaları</h4>
+                                    <ul id="item-tips">
+                                        <!-- Tips will be injected here -->
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="doc-visual">
+                                <div class="visual-container">
+                                    <img id="item-image" src="" alt="İşaret Görseli">
+                                    <div class="visual-overlay">Örnek Gösterim</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="camera-controls">
-                        <button id="start-camera" class="btn btn-primary"><i class="fas fa-video"></i> Kamerayı Başlat</button>
-                        <button id="next-step" class="btn btn-outline" disabled>Sıradaki <i class="fas fa-arrow-right"></i></button>
+
+                    <!-- Interactive Practice Area -->
+                    <div class="card practice-area">
+                        <div class="practice-header">
+                            <h3><i class="fas fa-video"></i> Uygulama Yap</h3>
+                            <p>Kameranı aç ve işareti tekrarla. Yapay zeka seni yönlendirecek.</p>
+                        </div>
+                        
+                        <div class="practice-container">
+                            <div class="video-wrapper">
+                                <video id="webcam" autoplay playsinline></video>
+                                <canvas id="overlay"></canvas>
+                                <div class="ai-feedback" id="feedback-box">
+                                    <span id="feedback-text">Kamera Bekleniyor...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="practice-controls">
+                                <button id="start-camera" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-camera"></i> Kamerayı Başlat
+                                </button>
+                                <button id="verify-action" class="btn btn-success btn-lg hidden">
+                                    <i class="fas fa-check-circle"></i> Doğrula
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Guide Section -->
-                <div class="guide-section">
-                    <div class="guide-card card">
-                        <h3>Nasıl Yapılır?</h3>
-                        <img src="https://images.unsplash.com/photo-1534120247760-c44c3e4a62f1?auto=format&fit=crop&q=80&w=300" alt="E Letter Guide" class="guide-img">
-                        <div class="guide-steps">
-                            <p><i class="fas fa-info-circle"></i> Parmaklarınızı avuç içinize doğru bükün.</p>
-                            <p><i class="fas fa-info-circle"></i> Baş parmağınızı diğer parmakların altına yerleştirin.</p>
+                <!-- Right: Curriculum Sidebar -->
+                <div class="lesson-sidebar">
+                    <div class="card curriculum-card">
+                        <h3>Eğitim İçeriği</h3>
+                        <div class="curriculum-list" id="curriculum-list">
+                            <!-- Curriculum items will be injected here -->
                         </div>
                     </div>
 
-                    <div class="progress-card card">
-                        <h3>Bölüm İlerlemesi</h3>
-                        <div class="mini-steps">
-                            <div class="mini-step completed">E</div>
-                            <div class="mini-step current">F</div>
-                            <div class="mini-step">G</div>
-                            <div class="mini-step">H</div>
+                    <div class="card stats-card">
+                        <h3>Senin İlerlemen</h3>
+                        <div class="mini-stat">
+                            <span>Tamamlanan</span>
+                            <strong id="completed-count">0/12</strong>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="total-progress-fill" class="progress-fill" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -97,8 +147,6 @@
         </main>
     </div>
 
-    <script src="../js/main.js"></script>
-    <script src="../js/camera.js"></script>
     <script type="module" src="../js/exercises.js"></script>
 </body>
 </html>
