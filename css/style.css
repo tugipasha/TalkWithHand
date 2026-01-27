@@ -103,3 +103,45 @@ button {
 .text-center { text-align: center; }
 .mt-2 { margin-top: 2rem; }
 .mb-2 { margin-bottom: 2rem; }
+
+/* Mobile Navigation */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--sidebar-bg);
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.mobile-nav ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mobile-nav a {
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+}
+
+.mobile-nav li.active a {
+    color: var(--primary-blue);
+}
+
+.mobile-nav i {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 992px) {
+    .mobile-nav {
+        display: block;
+    }
+}

@@ -30,6 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
             link.parentElement.classList.remove('active');
         }
     });
+
+    // Mobile Menu Toggle for Landing Page
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const landingNavLinks = document.querySelector('.nav-links');
+
+    if (menuToggle && landingNavLinks) {
+        menuToggle.addEventListener('click', () => {
+            landingNavLinks.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            }
+        });
+    }
 });
 
 function applyPreferences() {

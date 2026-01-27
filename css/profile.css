@@ -102,11 +102,18 @@ body.dark-mode .badge {
     max-width: 800px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
     .profile-grid {
         grid-template-columns: 1fr;
     }
+
     .settings-card {
         grid-column: span 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
