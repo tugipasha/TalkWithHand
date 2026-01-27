@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - TalkWithHand</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="logo">
+                    <i class="fas fa-hands-asl-interpreting"></i>
+                    <span>TalkWithHand</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> Egzersizler</a></li>
+                    <li><a href="profile.html"><i class="fas fa-chart-bar"></i> İlerlemem</a></li>
+                    <li class="active"><a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p style="font-size: 0.7rem; color: #64748b; margin-bottom: 10px; text-align: center;">TEKNOFEST 2026</p>
+                <a href="#" id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="user-info">
+                    <h1>Ayarlar</h1>
+                    <p>Uygulama deneyimini kişiselleştir.</p>
+                </div>
+            </header>
+
+            <div class="settings-container">
+                <!-- Profile Settings -->
+                <section class="settings-section card">
+                    <div class="section-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>Profil Bilgileri</h3>
+                    </div>
+                    <form class="settings-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Ad Soyad</label>
+                                <input type="text" value="Ahmet Yılmaz" placeholder="Ad Soyad">
+                            </div>
+                            <div class="form-group">
+                                <label>E-posta</label>
+                                <input type="email" value="ahmet@mail.com" placeholder="E-posta">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Biyografi</label>
+                            <textarea placeholder="Kendinden bahset..." rows="3">İşaret dilini öğrenmek için buradayım!</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Bilgileri Güncelle</button>
+                    </form>
+                </section>
+
+                <!-- Appearance Settings -->
+                <section class="settings-section card">
+                    <div class="section-header">
+                        <i class="fas fa-paint-brush"></i>
+                        <h3>Görünüm ve Tema</h3>
+                    </div>
+                    <div class="appearance-grid">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Koyu Tema</h4>
+                                <p>Göz yorgunluğunu azaltmak için karanlık modu aktifleştir.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-mode-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Yazı Tipi</h4>
+                                <p>Okunabilirliği artırmak için font stilini değiştir.</p>
+                            </div>
+                            <select id="font-family-select" class="form-select">
+                                <option value="'Inter', sans-serif">Inter (Varsayılan)</option>
+                                <option value="'Roboto', sans-serif">Roboto</option>
+                                <option value="'Open Sans', sans-serif">Open Sans</option>
+                                <option value="'Lexend', sans-serif">Lexend (Erişilebilir)</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Yazı Boyutu</h4>
+                                <p>Metinlerin büyüklüğünü ayarla.</p>
+                            </div>
+                            <div class="font-size-controls">
+                                <button class="size-btn" data-size="small">A-</button>
+                                <button class="size-btn active" data-size="medium">A</button>
+                                <button class="size-btn" data-size="large">A+</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Notification Settings -->
+                <section class="settings-section card">
+                    <div class="section-header">
+                        <i class="fas fa-bell"></i>
+                        <h3>Bildirimler</h3>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Günlük Hatırlatıcı</h4>
+                            <p>Öğrenme serini bozmamak için her gün bildirim al.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>E-posta Duyuruları</h4>
+                            <p>Yeni dersler ve güncellemeler hakkında bilgi al.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Danger Zone -->
+                <section class="settings-section card danger-zone">
+                    <div class="section-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Tehlikeli Bölge</h3>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Hesabı Sil</h4>
+                            <p>Tüm verilerin kalıcı olarak silinecektir. Bu işlem geri alınamaz.</p>
+                        </div>
+                        <button class="btn btn-outline-danger">Hesabı Kalıcı Olarak Sil</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script type="module" src="../js/settings.js"></script>
+</body>
+</html>

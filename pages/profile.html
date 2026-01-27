@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil ve İlerleme - TalkWithHand</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="logo">
+                    <i class="fas fa-hands-asl-interpreting"></i>
+                    <span>TalkWithHand</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> Egzersizler</a></li>
+                    <li><a href="profile.html"><i class="fas fa-chart-bar"></i> İlerlemem</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p style="font-size: 0.7rem; color: #64748b; margin-bottom: 10px; text-align: center;">TEKNOFEST 2026</p>
+                <a href="#" id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="user-info">
+                    <h1>Profilim</h1>
+                    <p>Öğrenme yolculuğundaki başarını incele.</p>
+                </div>
+            </header>
+
+            <div class="profile-grid">
+                <!-- User Profile Card -->
+                <div class="profile-card card">
+                    <div class="profile-header">
+                        <img id="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&size=128" alt="User" class="large-avatar">
+                        <h2 id="profile-name">Kullanıcı</h2>
+                        <p id="profile-level">Başlangıç Seviyesi</p>
+                        <div class="badges">
+                            <span class="badge"><i class="fas fa-award"></i> Hızlı Öğrenen</span>
+                            <span id="profile-streak" class="badge"><i class="fas fa-fire"></i> 0 Günlük Seri</span>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="p-stat">
+                            <span id="completed-lessons-count" class="num">0</span>
+                            <span class="lab">Tamamlanan Ders</span>
+                        </div>
+                        <div class="p-stat">
+                            <span id="total-points" class="num">0</span>
+                            <span class="lab">Toplam Puan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Charts -->
+                <div class="charts-section">
+                    <div class="chart-card card">
+                        <h3>Haftalık Aktivite (Dakika)</h3>
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                    <div class="chart-card card">
+                        <h3>Konu Bazlı Başarı Oranı</h3>
+                        <canvas id="successChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/charts.js"></script>
+    <script type="module" src="../js/profile.js"></script>
+</body>
+</html>

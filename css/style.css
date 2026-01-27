@@ -1,0 +1,105 @@
+:root {
+    --primary-blue: #2563eb;
+    --primary-dark: #1e3a8a;
+    --bg-dark: #0f172a;
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-light: #f1f5f9;
+    --white: #ffffff;
+    --card-bg: #ffffff;
+    --sidebar-bg: #0f172a;
+    --accent: #38bdf8;
+    --error: #ef4444;
+    --success: #22c55e;
+    
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --transition: all 0.3s ease;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius: 12px;
+}
+
+body.dark-mode {
+    --bg-light: #0f172a;
+    --bg-dark: #f8fafc;
+    --text-dark: #f1f5f9;
+    --text-light: #1e293b;
+    --card-bg: #1e293b;
+    --white: #1e293b;
+    --sidebar-bg: #020617;
+}
+
+body.font-small { font-size: 14px; }
+body.font-medium { font-size: 16px; }
+body.font-large { font-size: 18px; }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Helper Classes */
+.btn {
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-outline {
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+
+.text-center { text-align: center; }
+.mt-2 { margin-top: 2rem; }
+.mb-2 { margin-bottom: 2rem; }

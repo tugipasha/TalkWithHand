@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egzersizler - TalkWithHand</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/exercises.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="logo">
+                    <i class="fas fa-hands-asl-interpreting"></i>
+                    <span>TalkWithHand</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="active"><a href="exercises.html"><i class="fas fa-dumbbell"></i> Egzersizler</a></li>
+                    <li><a href="profile.html"><i class="fas fa-chart-bar"></i> İlerlemem</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Ayarlar</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p style="font-size: 0.7rem; color: #64748b; margin-bottom: 10px; text-align: center;">TEKNOFEST 2026</p>
+                <a href="#" id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="exercise-info">
+                    <h1>Harfler - Bölüm 2</h1>
+                    <p>Hedef: <span class="target-letter">"E"</span> Harfini Yapın</p>
+                </div>
+                <div class="exercise-timer">
+                    <i class="fas fa-clock"></i>
+                    <span id="timer">00:45</span>
+                </div>
+            </header>
+
+            <div class="exercise-container">
+                <!-- Camera Feed Section -->
+                <div class="camera-section card">
+                    <div class="video-wrapper">
+                        <video id="webcam" autoplay playsinline></video>
+                        <canvas id="overlay"></canvas>
+                        <div class="ai-feedback" id="feedback-box">
+                            <span id="feedback-text">Hazırlanıyor...</span>
+                        </div>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="start-camera" class="btn btn-primary"><i class="fas fa-video"></i> Kamerayı Başlat</button>
+                        <button id="next-step" class="btn btn-outline" disabled>Sıradaki <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Guide Section -->
+                <div class="guide-section">
+                    <div class="guide-card card">
+                        <h3>Nasıl Yapılır?</h3>
+                        <img src="https://images.unsplash.com/photo-1534120247760-c44c3e4a62f1?auto=format&fit=crop&q=80&w=300" alt="E Letter Guide" class="guide-img">
+                        <div class="guide-steps">
+                            <p><i class="fas fa-info-circle"></i> Parmaklarınızı avuç içinize doğru bükün.</p>
+                            <p><i class="fas fa-info-circle"></i> Baş parmağınızı diğer parmakların altına yerleştirin.</p>
+                        </div>
+                    </div>
+
+                    <div class="progress-card card">
+                        <h3>Bölüm İlerlemesi</h3>
+                        <div class="mini-steps">
+                            <div class="mini-step completed">E</div>
+                            <div class="mini-step current">F</div>
+                            <div class="mini-step">G</div>
+                            <div class="mini-step">H</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/camera.js"></script>
+    <script type="module" src="../js/exercises.js"></script>
+</body>
+</html>
