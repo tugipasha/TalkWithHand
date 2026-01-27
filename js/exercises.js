@@ -167,35 +167,57 @@ class LessonManager {
                 btn.innerHTML = '<i class="fas fa-stop"></i> Kamerayı Durdur';
                 
                 verifyBtn.onclick = () => {
-                    const result = CameraService.verifySign(CameraService.latestResults, this.currentLesson.items[this.currentItemIndex].id);
-                    if (result.success) {
-                        feedback.textContent = result.message + ' ✨';
-                        document.getElementById('feedback-box').classList.add('success');
-                        setTimeout(() => {
-                            document.getElementById('feedback-box').classList.remove('success');
-                            this.nextItem();
-                        }, 2000);
-                    } else {
-                        feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
-                        if (window.TWH_API_URL && window.AIService) {
-                            const landmarksArr = CameraService.latestResults?.multiHandLandmarks || [];
+                    feedback.textContent = 'Görüntü alınıyor... Lütfen pozisyonu koru.';
+                    setTimeout(() => {
+                        const frame = CameraService.captureFrame();
+                        const targetId = this.currentLesson.items[this.currentItemIndex].id;
+                        if (window.TWH_API_URL && window.AIService && frame) {
+                            feedback.textContent = 'Görüntü işleniyor...';
                             window.AIService.remoteClassify({
-                                landmarks: landmarksArr,
-                                target: this.currentLesson.items[this.currentItemIndex].id
+                                image: frame,
+                                target: targetId
                             }).then(remote => {
                                 if (remote && remote.isCorrect) {
-                                    feedback.textContent = (remote.message || 'Doğru') + ' ✨';
+                                    const accRemote = typeof remote.accuracy === 'number' ? ` (${remote.accuracy}%)` : '';
+                                    feedback.textContent = (remote.message || 'Doğru') + accRemote + ' ✨';
                                     document.getElementById('feedback-box').classList.add('success');
                                     setTimeout(() => {
                                         document.getElementById('feedback-box').classList.remove('success');
                                         this.nextItem();
                                     }, 2000);
-                                } else if (remote && remote.message) {
-                                    feedback.textContent = remote.message;
+                                } else {
+                                    const msg = (remote && remote.message) ? remote.message : 'Uygun değil. Parmak ve bilek pozisyonunu düzelt.';
+                                    feedback.textContent = msg;
                                 }
-                            }).catch(() => {});
+                            }).catch(() => {
+                                const result = CameraService.verifySign(CameraService.latestResults, targetId);
+                                const accTxt = typeof result.accuracy === 'number' ? ` (${result.accuracy}%)` : '';
+                                if (result.success) {
+                                    feedback.textContent = result.message + accTxt + ' ✨';
+                                    document.getElementById('feedback-box').classList.add('success');
+                                    setTimeout(() => {
+                                        document.getElementById('feedback-box').classList.remove('success');
+                                        this.nextItem();
+                                    }, 2000);
+                                } else {
+                                    feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
+                                }
+                            });
+                        } else {
+                            const result = CameraService.verifySign(CameraService.latestResults, targetId);
+                            const accTxt = typeof result.accuracy === 'number' ? ` (${result.accuracy}%)` : '';
+                            if (result.success) {
+                                feedback.textContent = result.message + accTxt + ' ✨';
+                                document.getElementById('feedback-box').classList.add('success');
+                                setTimeout(() => {
+                                    document.getElementById('feedback-box').classList.remove('success');
+                                    this.nextItem();
+                                }, 2000);
+                            } else {
+                                feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
+                            }
                         }
-                    }
+                    }, 1200);
                 };
 
             } catch (err) {

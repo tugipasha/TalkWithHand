@@ -41,6 +41,22 @@ const CameraService = {
             height: 480
         });
     },
+    
+    captureFrame() {
+        if (!this.videoElement) return null;
+        const w = this.videoElement.videoWidth || 640;
+        const h = this.videoElement.videoHeight || 480;
+        const temp = document.createElement('canvas');
+        temp.width = w;
+        temp.height = h;
+        const ctx = temp.getContext('2d');
+        ctx.drawImage(this.videoElement, 0, 0, w, h);
+        try {
+            return temp.toDataURL('image/jpeg', 0.85);
+        } catch {
+            return null;
+        }
+    },
 
     async start() {
         if (this.isStarted) return;
