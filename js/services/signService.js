@@ -8,17 +8,20 @@ export class SignService {
 
     async init(){
         try {
+            // Sayfa konumuna göre base path belirliyoruz (pages/ altındaysa ../ değilse ./)
+            const isPage = window.location.pathname.includes('/pages/');
+            const basePath = isPage ? '../' : './';
+
             // Model ve yardımcı dosyaları assets/web_model/ altından yüklüyoruz
-            // signService.js -> js/services/ klasöründe olduğu için ../../ ile köke çıkıyoruz
-            this.model = await tf.loadLayersModel('../../assets/web_model/model.json');
+            this.model = await tf.loadLayersModel(`${basePath}assets/web_model/model.json`);
             
             // Scaler parametrelerini ve etiketleri yüklüyoruz
-            const scalerRes = await fetch('../../assets/web_model/scaler_params.json');
+            const scalerRes = await fetch(`${basePath}assets/web_model/scaler_params.json`);
             if (scalerRes.ok) {
                 this.scalerParams = await scalerRes.json();
             }
 
-            const labelsRes = await fetch('../../assets/web_model/labels.json');
+            const labelsRes = await fetch(`${basePath}assets/web_model/labels.json`);
             if (labelsRes.ok) {
                 this.labels = await labelsRes.json();
             } else {
