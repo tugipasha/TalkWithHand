@@ -1,5 +1,5 @@
 /**
- * CameraService: MediaPipe Hands kullanarak el takibi ve işaret algılama
+ * CameraService: MediaPipe Hands kullanarak el takibi ve görselleştirme
  */
 const CameraService = {
     hands: null,
@@ -24,7 +24,7 @@ const CameraService = {
         });
 
         this.hands.setOptions({
-            maxNumHands: 2,
+            maxNumHands: 1,
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
@@ -35,27 +35,13 @@ const CameraService = {
         // Kamera Yapılandırması
         this.camera = new Camera(this.videoElement, {
             onFrame: async () => {
-                await this.hands.send({ image: this.videoElement });
+                if (this.isStarted) {
+                    await this.hands.send({ image: this.videoElement });
+                }
             },
             width: 640,
             height: 480
         });
-    },
-    
-    captureFrame() {
-        if (!this.videoElement) return null;
-        const w = this.videoElement.videoWidth || 640;
-        const h = this.videoElement.videoHeight || 480;
-        const temp = document.createElement('canvas');
-        temp.width = w;
-        temp.height = h;
-        const ctx = temp.getContext('2d');
-        ctx.drawImage(this.videoElement, 0, 0, w, h);
-        try {
-            return temp.toDataURL('image/jpeg', 0.85);
-        } catch {
-            return null;
-        }
     },
 
     async start() {
@@ -79,11 +65,11 @@ const CameraService = {
 
     onResults(results) {
         this.latestResults = results;
-        // Canvas'ı temizle
+        
+        // Canvas'ı temizle ve çizim yap
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
         
-        // El işaretlerini çiz
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
                 drawConnectors(this.canvasCtx, landmarks, HAND_CONNECTIONS,
@@ -93,35 +79,12 @@ const CameraService = {
         }
         this.canvasCtx.restore();
 
-        // Callback'leri çalıştır
+        // Kayıtlı callback'leri çalıştır
         this.onResultCallbacks.forEach(cb => cb(results));
     },
 
     addResultCallback(callback) {
         this.onResultCallbacks.push(callback);
-    },
-
-    /**
-     * İşaret Doğrulama Mantığı
-     * AIService kullanarak el hareketini analiz eder.
-     */
-    verifySign(results, targetSignId) {
-        if (!results || !results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-            return { success: false, message: 'El algılanamadı. Lütfen elinizi kameraya gösterin.' };
-        }
-
-        const landmarksArr = results.multiHandLandmarks;
-        
-        if (window.AIService) {
-            const analysis = window.AIService.analyzeLandmarks(landmarksArr, targetSignId);
-            return {
-                success: analysis.isCorrect,
-                message: analysis.message,
-                accuracy: analysis.accuracy
-            };
-        }
-
-        return { success: false, message: 'Yapay zeka servisi hazır değil.' };
     }
 };
 

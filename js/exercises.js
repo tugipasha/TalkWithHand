@@ -1,6 +1,7 @@
 import AuthService from './services/auth.js';
 import LessonService from './services/lessonService.js';
 import UserService from './services/user.js';
+import { SignService } from './services/signService.js';
 
 /**
  * TalkWithHand - Eğitim & Ders Yönetimi
@@ -10,7 +11,7 @@ class LessonManager {
     constructor() {
         this.currentLesson = null;
         this.currentItemIndex = 0;
-        this.stream = null;
+        this.signService = new SignService();
         
         this.init();
     }
@@ -22,7 +23,10 @@ class LessonManager {
             return;
         }
 
-        // İlk dersi yükle (veya URL'den al)
+        // SignService Başlat
+        await this.signService.init();
+
+        // İlk dersi yükle
         const curriculum = LessonService.getCurriculum();
         this.loadLesson(curriculum[0].id);
 
@@ -56,20 +60,17 @@ class LessonManager {
     updateUI() {
         const item = this.currentLesson.items[this.currentItemIndex];
         
-        // Header info
         document.getElementById('lesson-title').textContent = this.currentLesson.title;
         document.getElementById('lesson-progress-text').textContent = `${this.currentItemIndex + 1} / ${this.currentLesson.items.length}`;
         
         const progressPercent = ((this.currentItemIndex + 1) / this.currentLesson.items.length) * 100;
         document.getElementById('lesson-progress-fill').style.width = `${progressPercent}%`;
 
-        // Content
         document.getElementById('item-label').textContent = item.label;
         document.getElementById('item-content').textContent = item.content;
         document.getElementById('item-image').src = item.imageUrl;
         document.getElementById('lesson-type-badge').textContent = this.currentLesson.type === 'alphabet' ? 'Harf' : 'Kelime';
 
-        // Tips
         const tipsList = document.getElementById('item-tips');
         tipsList.innerHTML = '';
         item.tips.forEach(tip => {
@@ -78,7 +79,6 @@ class LessonManager {
             tipsList.appendChild(li);
         });
 
-        // Update stats
         document.getElementById('completed-count').textContent = `0/${this.currentLesson.items.length}`;
     }
 
@@ -111,9 +111,7 @@ class LessonManager {
             this.updateUI();
             this.renderCurriculum();
         } else {
-            // Dersi tamamla
             UserService.completeLesson(this.currentLesson.id);
-
             const nextLesson = LessonService.getNextLesson(this.currentLesson.id);
             if (nextLesson) {
                 if (confirm('Tebrikler! Bu dersi tamamladınız. Bir sonraki derse geçmek ister misiniz?')) {
@@ -147,7 +145,7 @@ class LessonManager {
             verifyBtn.classList.add('hidden');
         } else {
             try {
-                feedback.textContent = 'Yapay Zeka Yükleniyor...';
+                feedback.textContent = 'Kamera Başlatılıyor...';
                 
                 if (!CameraService.hands) {
                     await CameraService.init(video, canvas);
@@ -165,65 +163,59 @@ class LessonManager {
 
                 await CameraService.start();
                 btn.innerHTML = '<i class="fas fa-stop"></i> Kamerayı Durdur';
-                
+
                 verifyBtn.onclick = () => {
-                    feedback.textContent = 'Görüntü alınıyor... Lütfen pozisyonu koru.';
-                    setTimeout(() => {
-                        const frame = CameraService.captureFrame();
-                        const targetId = this.currentLesson.items[this.currentItemIndex].id;
-                        if (window.TWH_API_URL && window.AIService && frame) {
-                            feedback.textContent = 'Görüntü işleniyor...';
-                            window.AIService.remoteClassify({
-                                image: frame,
-                                target: targetId
-                            }).then(remote => {
-                                if (remote && remote.isCorrect) {
-                                    const accRemote = typeof remote.accuracy === 'number' ? ` (${remote.accuracy}%)` : '';
-                                    feedback.textContent = (remote.message || 'Doğru') + accRemote + ' ✨';
-                                    document.getElementById('feedback-box').classList.add('success');
-                                    setTimeout(() => {
-                                        document.getElementById('feedback-box').classList.remove('success');
-                                        this.nextItem();
-                                    }, 2000);
-                                } else {
-                                    const msg = (remote && remote.message) ? remote.message : 'Uygun değil. Parmak ve bilek pozisyonunu düzelt.';
-                                    feedback.textContent = msg;
-                                }
-                            }).catch(() => {
-                                const result = CameraService.verifySign(CameraService.latestResults, targetId);
-                                const accTxt = typeof result.accuracy === 'number' ? ` (${result.accuracy}%)` : '';
-                                if (result.success) {
-                                    feedback.textContent = result.message + accTxt + ' ✨';
-                                    document.getElementById('feedback-box').classList.add('success');
-                                    setTimeout(() => {
-                                        document.getElementById('feedback-box').classList.remove('success');
-                                        this.nextItem();
-                                    }, 2000);
-                                } else {
-                                    feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
-                                }
-                            });
-                        } else {
-                            const result = CameraService.verifySign(CameraService.latestResults, targetId);
-                            const accTxt = typeof result.accuracy === 'number' ? ` (${result.accuracy}%)` : '';
-                            if (result.success) {
-                                feedback.textContent = result.message + accTxt + ' ✨';
-                                document.getElementById('feedback-box').classList.add('success');
-                                setTimeout(() => {
-                                    document.getElementById('feedback-box').classList.remove('success');
-                                    this.nextItem();
-                                }, 2000);
-                            } else {
-                                feedback.textContent = result.message || 'Tekrar dene, el pozisyonunu düzelt.';
-                            }
-                        }
-                    }, 1200);
+                    this.verifyCurrentSign();
                 };
 
             } catch (err) {
                 console.error("Kamera hatası:", err);
                 feedback.textContent = 'Hata: Kameraya erişilemedi.';
-                alert("Kameraya erişilemedi. Lütfen izin verdiğinizden emin olun.");
+            }
+        }
+    }
+
+    verifyCurrentSign() {
+        const results = CameraService.latestResults;
+        const feedback = document.getElementById('feedback-text');
+        const feedbackBox = document.getElementById('feedback-box');
+        
+        // Hedef etiketi temizle (örn: "A Harfi" -> "A")
+        let targetLabel = this.currentLesson.items[this.currentItemIndex].label.split(' ')[0].toUpperCase();
+        
+        // Türkçe karakterleri modele uygun şekilde normalize et (Eğer model sadece İngilizce karakter destekliyorsa)
+        const charMap = { 'Ç': 'C', 'Ğ': 'G', 'İ': 'I', 'Ö': 'O', 'Ş': 'S', 'Ü': 'U' };
+        if (!this.signService.labels.includes(targetLabel)) {
+            targetLabel = charMap[targetLabel] || targetLabel;
+        }
+
+        if (!results || !results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+            feedback.textContent = 'El algılanamadı!';
+            return;
+        }
+
+        const prediction = this.signService.predict(results.multiHandLandmarks[0]);
+        
+        if (prediction) {
+            console.log('Tahmin:', prediction, 'Hedef:', targetLabel);
+            const isCorrect = prediction.label === targetLabel && prediction.confidence > 0.6;
+
+            if (isCorrect) {
+                feedback.textContent = `Harika! "${prediction.label}" harfini doğru yaptın. (%${(prediction.confidence * 100).toFixed(1)})`;
+                feedbackBox.classList.add('success');
+                
+                setTimeout(() => {
+                    feedbackBox.classList.remove('success');
+                    this.nextItem();
+                }, 2000);
+            } else {
+                if (prediction.confidence > 0.3) {
+                    feedback.textContent = `Benzeyen: "${prediction.label}" (%${(prediction.confidence * 100).toFixed(1)}). Lütfen "${targetLabel}" harfini tekrar dene.`;
+                } else {
+                    feedback.textContent = `Anlaşılamadı. Lütfen elini net göster ve "${targetLabel}" harfini tekrarla.`;
+                }
+                feedbackBox.classList.add('error');
+                setTimeout(() => feedbackBox.classList.remove('error'), 2000);
             }
         }
     }
