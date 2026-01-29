@@ -117,6 +117,14 @@
                             <div class="video-wrapper">
                                 <video id="webcam" autoplay playsinline></video>
                                 <canvas id="overlay"></canvas>
+                                
+                                <!-- Real-time Prediction Display -->
+                                <div id="prediction-display" class="prediction-overlay hidden">
+                                    <span class="prediction-label">Tahmin</span>
+                                    <span id="prediction-value" class="prediction-value">-</span>
+                                    <span id="prediction-confidence" class="prediction-confidence">%0</span>
+                                </div>
+
                                 <div class="ai-feedback" id="feedback-box">
                                     <span id="feedback-text">Kamera Bekleniyor...</span>
                                 </div>

@@ -151,12 +151,30 @@ class LessonManager {
                     await CameraService.init(video, canvas);
                     
                     CameraService.addResultCallback((results) => {
+                        const predictionDisplay = document.getElementById('prediction-display');
+                        const predictionValue = document.getElementById('prediction-value');
+                        const predictionConf = document.getElementById('prediction-confidence');
+
                         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                             feedback.textContent = 'El Algılandı! İşareti Yapın...';
                             verifyBtn.classList.remove('hidden');
+                            
+                            // Real-time Prediction
+                            const prediction = this.signService.predict(results.multiHandLandmarks[0]);
+                            if (prediction) {
+                                predictionDisplay.classList.remove('hidden');
+                                predictionValue.textContent = prediction.label;
+                                predictionConf.textContent = `%${(prediction.confidence * 100).toFixed(0)}`;
+                                
+                                // Hedef harfle eşleşiyorsa görsel geri bildirim ver
+                                let targetLabel = this.currentLesson.items[this.currentItemIndex].label.split(' ')[0].toUpperCase();
+                                const isMatch = prediction.label === targetLabel && prediction.confidence > 0.6;
+                                predictionDisplay.style.borderColor = isMatch ? '#22c55e' : '#2563eb';
+                            }
                         } else {
                             feedback.textContent = 'El Bekleniyor...';
                             verifyBtn.classList.add('hidden');
+                            predictionDisplay.classList.add('hidden');
                         }
                     });
                 }
