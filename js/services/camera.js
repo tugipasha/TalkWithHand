@@ -24,7 +24,7 @@ const CameraService = {
         });
 
         this.hands.setOptions({
-            maxNumHands: 1,
+            maxNumHands: 2,
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5

@@ -41,33 +41,73 @@ export class SignService {
         }
     }
 
-    predict(landmarks) {
-        if (!this.isReady || !this.model) return null;
+    predict(multiHandLandmarks) {
+        if (!this.isReady || !this.model || !multiHandLandmarks || multiHandLandmarks.length === 0) return null;
 
-        // 1. MediaPipe verisini düzleştir (21 nokta * 3 koordinat = 63 girdi)
-        let rawData = [];
-        landmarks.forEach(lm => rawData.push(lm.x, lm.y, lm.z));
-        
-        // Formül: z = (x - mean) / scale (Eğer scalerParams yoksa ham veriyi kullan)
-        let processedData = rawData;
-        if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
-            processedData = rawData.map((val, i) => {
-                return (val - this.scalerParams.mean[i]) / this.scalerParams.scale[i];
+        const inputShape = this.model.inputs[0].shape; // Örn: [null, 63] veya [null, 126]
+        const expectedFeatures = inputShape[1];
+
+        // Eğer model 126 girdi bekliyorsa (2 el), elleri birleştiriyoruz
+        if (expectedFeatures === 126) {
+            let combinedData = new Array(126).fill(0);
+            
+            multiHandLandmarks.forEach((landmarks, idx) => {
+                if (idx > 1) return; // Sadece ilk iki eli al
+                landmarks.forEach((lm, lmIdx) => {
+                    const baseIdx = idx * 63 + lmIdx * 3;
+                    combinedData[baseIdx] = lm.x;
+                    combinedData[baseIdx + 1] = lm.y;
+                    combinedData[baseIdx + 2] = lm.z;
+                });
+            });
+
+            // Normalizasyon (Eğer scaler varsa)
+            let processedData = combinedData;
+            if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
+                processedData = combinedData.map((val, i) => {
+                    return (val - (this.scalerParams.mean[i] || 0)) / (this.scalerParams.scale[i] || 1);
+                });
+            }
+
+            return tf.tidy(() => {
+                const inputTensor = tf.tensor2d([processedData]);
+                const prediction = this.model.predict(inputTensor);
+                const probabilities = prediction.dataSync();
+                const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+                return {
+                    label: this.labels[maxIdx] || `Bilinmeyen (${maxIdx})`,
+                    confidence: probabilities[maxIdx]
+                };
             });
         }
 
-        return tf.tidy(() => {
-            const inputTensor = tf.tensor2d([processedData]);
-            const prediction = this.model.predict(inputTensor);
-            const probabilities = prediction.dataSync();
+        // Eğer model 63 girdi bekliyorsa (tek el), her el için ayrı tahmin yapıp en iyisini alıyoruz
+        const predictions = multiHandLandmarks.map(landmarks => {
+            let rawData = [];
+            landmarks.forEach(lm => rawData.push(lm.x, lm.y, lm.z));
             
-            const maxIdx = probabilities.indexOf(Math.max(...probabilities));
-            
-            return {
-                label: this.labels[maxIdx] || `Bilinmeyen (${maxIdx})`,
-                confidence: probabilities[maxIdx],
-                allScores: Array.from(probabilities)
-            };
+            let processedData = rawData;
+            if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
+                processedData = rawData.map((val, i) => {
+                    return (val - (this.scalerParams.mean[i] || 0)) / (this.scalerParams.scale[i] || 1);
+                });
+            }
+
+            return tf.tidy(() => {
+                const inputTensor = tf.tensor2d([processedData]);
+                const prediction = this.model.predict(inputTensor);
+                const probabilities = prediction.dataSync();
+                const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+                
+                return {
+                    label: this.labels[maxIdx] || `Bilinmeyen (${maxIdx})`,
+                    confidence: probabilities[maxIdx]
+                };
+            });
         });
+
+        return predictions.reduce((best, current) => {
+            return (current.confidence > (best ? best.confidence : 0)) ? current : best;
+        }, null);
     }
 }
