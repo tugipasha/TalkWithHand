@@ -8,9 +8,13 @@ export class SignService {
 
     async init(){
         try {
-            // Sayfa konumuna göre base path belirliyoruz (pages/ altındaysa ../ değilse ./)
-            const isPage = window.location.pathname.includes('/pages/');
-            const basePath = isPage ? '../' : './';
+            // GitHub Pages veya lokal server farketmeksizin kök dizini buluyoruz
+            // Eğer URL'de /pages/ varsa bir üst dizine, yoksa mevcut dizine bakıyoruz
+            const pathParts = window.location.pathname.split('/');
+            const isInPagesFolder = pathParts.includes('pages');
+            const basePath = isInPagesFolder ? '../' : './';
+
+            console.log('Model yükleniyor, Base Path:', basePath);
 
             // Model ve yardımcı dosyaları assets/web_model/ altından yüklüyoruz
             this.model = await tf.loadLayersModel(`${basePath}assets/web_model/model.json`);
@@ -32,7 +36,8 @@ export class SignService {
             this.isReady = true;
             console.log('Yeni model ve veriler başarıyla yüklendi.');
         } catch(error){
-            console.error('Model güncellenirken hata oluştu:', error);
+            console.error('Model yüklenirken hata oluştu:', error);
+            console.log('Hata detayı: Lütfen assets/web_model/ klasörünün ve içindeki model.json dosyasının doğru yerde olduğundan emin olun.');
         }
     }
 
