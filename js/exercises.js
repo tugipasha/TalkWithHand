@@ -164,11 +164,20 @@ class LessonManager {
                             if (prediction) {
                                 predictionDisplay.classList.remove('hidden');
                                 predictionValue.textContent = prediction.label;
-                                predictionConf.textContent = `%${(prediction.confidence * 100).toFixed(0)}`;
+                                
+                                // Güvenilirlik ve Stabilite Gösterimi
+                                let confText = `%${(prediction.confidence * 100).toFixed(0)}`;
+                                if (!prediction.isStable) {
+                                    confText += ' (Dengeleniyor...)';
+                                    predictionDisplay.style.opacity = '0.7';
+                                } else {
+                                    predictionDisplay.style.opacity = '1';
+                                }
+                                predictionConf.textContent = confText;
                                 
                                 // Hedef harfle eşleşiyorsa görsel geri bildirim ver
                                 let targetLabel = this.currentLesson.items[this.currentItemIndex].label.split(' ')[0].toUpperCase();
-                                const isMatch = prediction.label === targetLabel && prediction.confidence > 0.6;
+                                const isMatch = prediction.label === targetLabel && prediction.confidence > 0.6 && prediction.isStable;
                                 predictionDisplay.style.borderColor = isMatch ? '#22c55e' : '#2563eb';
                             }
                         } else {
@@ -219,6 +228,10 @@ class LessonManager {
             const isCorrect = prediction.label === targetLabel && prediction.confidence > 0.6;
 
             if (isCorrect) {
+                if (!prediction.isStable) {
+                    feedback.textContent = 'İşaret doğru görünüyor, lütfen elini sabit tut...';
+                    return;
+                }
                 feedback.textContent = `Harika! "${prediction.label}" harfini doğru yaptın. (%${(prediction.confidence * 100).toFixed(1)})`;
                 feedbackBox.classList.add('success');
                 
