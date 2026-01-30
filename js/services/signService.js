@@ -83,12 +83,22 @@ export class SignService {
 
         // Eğer model 63 girdi bekliyorsa (tek el), her el için ayrı tahmin yapıp en iyisini alıyoruz
         const predictions = multiHandLandmarks.map(landmarks => {
-            let rawData = [];
-            landmarks.forEach(lm => rawData.push(lm.x, lm.y, lm.z));
+            // Bilek (Wrist) koordinatlarını al (Landmark 0)
+            const wrist = landmarks[0];
             
-            let processedData = rawData;
+            let relativeCoords = [];
+            landmarks.forEach(lm => {
+                // Her noktayı bileğe göre normalize et (Bilek 0,0,0 olur)
+                relativeCoords.push(
+                    lm.x - wrist.x,
+                    lm.y - wrist.y,
+                    lm.z - wrist.z
+                );
+            });
+            
+            let processedData = relativeCoords;
             if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
-                processedData = rawData.map((val, i) => {
+                processedData = relativeCoords.map((val, i) => {
                     return (val - (this.scalerParams.mean[i] || 0)) / (this.scalerParams.scale[i] || 1);
                 });
             }
