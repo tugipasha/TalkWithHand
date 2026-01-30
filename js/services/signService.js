@@ -4,6 +4,8 @@ export class SignService {
         this.scalerParams = null;
         this.labels = null;
         this.isReady = false;
+        this.predictionHistory = [];
+        this.historyLimit = 5; // Son 5 tahmini tut
     }
 
     async init(){
@@ -44,89 +46,42 @@ export class SignService {
     predict(results) {
         if (!this.isReady || !this.model || !results) return null;
 
-        const multiHandLandmarks = results.multiHandLandmarks;
-        const multiHandWorldLandmarks = results.multiHandWorldLandmarks;
+        // World Landmarks daha tutarlı olabilir (metre cinsinden 3D koordinatlar)
+        // Eğer yoksa normal landmarks kullan
+        const multiHandLandmarks = results.multiHandWorldLandmarks || results.multiHandLandmarks;
+        const multiHandedness = results.multiHandedness;
 
-        if (!multiHandLandmarks || multiHandLandmarks.length === 0) return null;
-
-        const inputShape = this.model.inputs[0].shape;
-        const expectedFeatures = inputShape[1];
-
-        // Eğer model 63 girdi bekliyorsa (tek el)
-        if (expectedFeatures === 63) {
-            const predictions = multiHandLandmarks.map((landmarks, idx) => {
-                // Öncelikli olarak World Landmarks (Metre cinsinden 3D) kullanıyoruz
-                // Çünkü backend modelleri genelde bununla eğitilir.
-                const worldLandmarks = multiHandWorldLandmarks ? multiHandWorldLandmarks[idx] : null;
-                
-                let rawData = [];
-                if (worldLandmarks) {
-                    const worldWrist = worldLandmarks[0];
-                    worldLandmarks.forEach(lm => {
-                        rawData.push(
-                            lm.x - worldWrist.x,
-                            lm.y - worldWrist.y,
-                            lm.z - worldWrist.z
-                        );
-                    });
-                } else {
-                    // Fallback: Normalized landmarks + Relative conversion
-                    const wrist = landmarks[0];
-                    landmarks.forEach(lm => {
-                        rawData.push(lm.x - wrist.x, lm.y - wrist.y, lm.z - wrist.z);
-                    });
-                }
-                
-                let processedData = rawData;
-                if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
-                    processedData = rawData.map((val, i) => {
-                        return (val - (this.scalerParams.mean[i] || 0)) / (this.scalerParams.scale[i] || 1);
-                    });
-                }
-
-                return tf.tidy(() => {
-                    const inputTensor = tf.tensor2d([processedData]);
-                    const prediction = this.model.predict(inputTensor);
-                    const probabilities = prediction.dataSync();
-                    const maxIdx = probabilities.indexOf(Math.max(...probabilities));
-                    
-                    return {
-                        label: this.labels[maxIdx] || `Bilinmeyen (${maxIdx})`,
-                        confidence: probabilities[maxIdx]
-                    };
-                });
-            });
-
-            return predictions.reduce((best, current) => {
-                return (current.confidence > (best ? best.confidence : 0)) ? current : best;
-            }, null);
+        if (!multiHandLandmarks || multiHandLandmarks.length === 0) {
+            this.predictionHistory = []; 
+            return null;
         }
 
-        // 126 Girdi (Çift el) durumu için basitleştirilmiş mantık
-        if (expectedFeatures === 126) {
-            let combinedData = new Array(126).fill(0);
-            multiHandLandmarks.slice(0, 2).forEach((landmarks, idx) => {
-                const worldLandmarks = multiHandWorldLandmarks ? multiHandWorldLandmarks[idx] : null;
-                const wrist = landmarks[0];
-                
-                landmarks.forEach((lm, lmIdx) => {
-                    const baseIdx = idx * 63 + lmIdx * 3;
-                    if (worldLandmarks) {
-                        const worldWrist = worldLandmarks[0];
-                        combinedData[baseIdx] = worldLandmarks[lmIdx].x - worldWrist.x;
-                        combinedData[baseIdx + 1] = worldLandmarks[lmIdx].y - worldWrist.y;
-                        combinedData[baseIdx + 2] = worldLandmarks[lmIdx].z - worldWrist.z;
-                    } else {
-                        combinedData[baseIdx] = lm.x - wrist.x;
-                        combinedData[baseIdx + 1] = lm.y - wrist.y;
-                        combinedData[baseIdx + 2] = lm.z - wrist.z;
-                    }
-                });
-            });
+        // Tahminleri topla
+        const predictions = multiHandLandmarks.map((landmarks, idx) => {
+            const handedness = multiHandedness ? multiHandedness[idx].label : 'Right';
+            const wrist = landmarks[0];
+            
+            let rawData = [];
+            landmarks.forEach(lm => {
+                // 1. Bilek merkezli (Relative) koordinatlar
+                let dx = lm.x - wrist.x;
+                let dy = lm.y - wrist.y;
+                let dz = lm.z - wrist.z;
 
-            let processedData = combinedData;
+                // 2. El aynalama (Hand Flip) kontrolü
+                // MediaPipe Web: 'Left' -> Sağ El, 'Right' -> Sol El
+                // Eğer model sağ el ile eğitildiyse ve sol el gelirse X ters çevrilmeli.
+                if (handedness === 'Right') { 
+                    dx = -dx;
+                }
+
+                rawData.push(dx, dy, dz);
+            });
+            
+            // Scaler uygula
+            let processedData = rawData;
             if (this.scalerParams && this.scalerParams.mean && this.scalerParams.scale) {
-                processedData = combinedData.map((val, i) => {
+                processedData = rawData.map((val, i) => {
                     return (val - (this.scalerParams.mean[i] || 0)) / (this.scalerParams.scale[i] || 1);
                 });
             }
@@ -136,13 +91,48 @@ export class SignService {
                 const prediction = this.model.predict(inputTensor);
                 const probabilities = prediction.dataSync();
                 const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+                
                 return {
                     label: this.labels[maxIdx] || `Bilinmeyen (${maxIdx})`,
                     confidence: probabilities[maxIdx]
                 };
             });
+        });
+
+        // En yüksek güvenilirlikli anlık tahmini bul
+        const bestCurrent = predictions.reduce((best, current) => {
+            return (current.confidence > (best ? best.confidence : 0)) ? current : best;
+        }, null);
+
+        if (!bestCurrent) return null;
+
+        // Geçmişe ekle (Smoothing)
+        this.predictionHistory.push(bestCurrent);
+        if (this.predictionHistory.length > this.historyLimit) {
+            this.predictionHistory.shift();
         }
 
-        return null;
+        // Geçmişteki en sık geçen etiketi bul
+        const counts = {};
+        let maxCount = 0;
+        let mostFrequentLabel = bestCurrent.label;
+        let avgConfidence = 0;
+
+        this.predictionHistory.forEach(p => {
+            counts[p.label] = (counts[p.label] || 0) + 1;
+            if (counts[p.label] > maxCount) {
+                maxCount = counts[p.label];
+                mostFrequentLabel = p.label;
+            }
+            avgConfidence += p.confidence;
+        });
+
+        avgConfidence /= this.predictionHistory.length;
+
+        return {
+            label: mostFrequentLabel,
+            confidence: avgConfidence,
+            isStable: maxCount >= (this.historyLimit / 2) // Çoğunluk sağlanmış mı?
+        };
     }
 }
