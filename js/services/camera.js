@@ -25,7 +25,7 @@ const CameraService = {
 
         this.hands.setOptions({
             maxNumHands: 2,
-            modelComplexity: 1,
+            modelComplexity: 1, // 0: Lite, 1: Full (daha iyi doğruluk)
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
@@ -49,7 +49,12 @@ const CameraService = {
         try {
             await this.camera.start();
             this.isStarted = true;
-            console.log('Camera started');
+            
+            // Canvas boyutlarını video boyutuna eşitle
+            this.canvasElement.width = this.videoElement.videoWidth || 640;
+            this.canvasElement.height = this.videoElement.videoHeight || 480;
+            
+            console.log('Camera started', this.canvasElement.width, 'x', this.canvasElement.height);
         } catch (error) {
             console.error('Camera failed to start:', error);
             throw error;
@@ -70,12 +75,19 @@ const CameraService = {
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
         
-        if (results.multiHandLandmarks) {
-            for (const landmarks of results.multiHandLandmarks) {
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+            // Debug: Kaç el algılandığını yazdır
+            // console.log(`${results.multiHandLandmarks.length} el algılandı.`);
+
+            results.multiHandLandmarks.forEach((landmarks, index) => {
+                const handedness = results.multiHandedness[index].label;
+                const color = handedness === 'Left' ? '#2563eb' : '#22c55e'; // Sağ el mavi, sol el yeşil (aynalı görüntüde)
+
                 drawConnectors(this.canvasCtx, landmarks, HAND_CONNECTIONS,
-                    { color: '#2563eb', lineWidth: 5 });
-                drawLandmarks(this.canvasCtx, landmarks, { color: '#ffffff', lineWidth: 2 });
-            }
+                    { color: color, lineWidth: 4 });
+                drawLandmarks(this.canvasCtx, landmarks, 
+                    { color: '#ffffff', lineWidth: 1, radius: 3 });
+            });
         }
         this.canvasCtx.restore();
 
