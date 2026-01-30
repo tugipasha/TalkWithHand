@@ -160,7 +160,7 @@ class LessonManager {
                             verifyBtn.classList.remove('hidden');
                             
                             // Real-time Prediction
-                            const prediction = this.signService.predict(results.multiHandLandmarks);
+                            const prediction = this.signService.predict(results);
                             if (prediction) {
                                 predictionDisplay.classList.remove('hidden');
                                 predictionValue.textContent = prediction.label;
@@ -212,7 +212,7 @@ class LessonManager {
             return;
         }
 
-        const prediction = this.signService.predict(results.multiHandLandmarks);
+        const prediction = this.signService.predict(results);
         
         if (prediction) {
             console.log('Tahmin:', prediction, 'Hedef:', targetLabel);
